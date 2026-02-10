@@ -1,0 +1,39 @@
+# Retrieval Augmented Generation (RAG)
+
+## What is RAG?
+Retrieval Augmented Generation (RAG) is a technique that combines information retrieval with generative models. It allows an AI system to augment its generation capabilities by retrieving relevant information from external sources before generating a response.
+
+## How RAG Works
+The RAG process typically follows these steps:
+1. **Query Processing**: The user submits a query or question.
+2. **Retrieval**: Relevant documents or chunks are retrieved from a knowledge base based on semantic similarity.
+3. **Augmentation**: The retrieved information is combined with the query.
+4. **Generation**: A generative model produces an answer using the augmented context.
+5. **Response**: The generated answer is returned to the user.
+
+## Advantages of RAG
+- **Reduces Hallucination**: By providing ground truth from documents, RAG reduces the model's tendency to generate false information.
+- **Up-to-Date Information**: RAG can incorporate recent information without retraining the model.
+- **Transparency**: Sources of information can be traced back to specific documents.
+- **Efficiency**: More efficient than retraining large language models with new information.
+
+## Components of RAG System
+- **Document Store**: Stores and manages documents (often using vector databases).
+- **Retriever**: Searches for relevant documents based on queries.
+- **Embedding Model**: Converts text into numerical vectors for similarity search.
+- **Generative Model**: Generates responses based on retrieved context.
+
+## RAG vs Fine-Tuning
+While fine-tuning requires retraining the model, RAG updates knowledge by modifying the document store. This makes RAG more flexible and cost-effective.
+
+## Applications of RAG
+- Question answering systems
+- Customer support chatbots
+- Document summarization
+- Knowledge bases
+- Legal document analysis
+
+## Popular RAG Frameworks
+- Langchain: A framework for building LLM applications
+- LlamaIndex: A data structure for organizing documents for LLM applications
+- Ray Serve: For serving RAG applications at scale

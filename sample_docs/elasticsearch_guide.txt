@@ -1,0 +1,46 @@
+# Elasticsearch and Vector Search
+
+## What is Elasticsearch?
+Elasticsearch is a distributed search and analytics engine built on top of Apache Lucene. It's designed for fast, scalable, and relevant search experiences. Elasticsearch is commonly used for full-text search, log analytics, and more recently, for vector similarity search.
+
+## Key Features
+- **Full-Text Search**: Powerful text search capabilities with relevance scoring.
+- **Distributed**: Elasticsearch is designed to scale horizontally.
+- **Real-time**: Provides near real-time search capabilities.
+- **RESTful API**: Easy to interact with using HTTP requests.
+- **Vector Search**: Supports dense vector search for semantic similarity.
+
+## Hybrid Search
+Hybrid search combines traditional full-text search (BM25 algorithm) with vector search (semantic search). This approach:
+- Captures both lexical relevance and semantic meaning
+- Improves search quality and relevance
+- Provides more accurate results for complex queries
+
+## Elasticsearch Installation
+Elasticsearch can be installed directly or via Docker containers. For development, Docker is recommended.
+
+## Mapping and Indexing
+An index in Elasticsearch is similar to a table in a database. Each index must have a mapping that defines how documents are stored and indexed. For RAG systems, the mapping typically includes:
+- Text field for the actual content
+- Dense vector field for embeddings
+- Metadata fields for tracking document information
+
+## Query DSL
+Elasticsearch provides a Query DSL (Domain Specific Language) for building complex queries. Common query types include:
+- Match queries
+- Boolean queries
+- Range queries
+- Geo queries
+- Knn (k-nearest neighbors) queries for vector search
+
+## Performance Optimization
+- Use appropriate analyzer for text fields
+- Batch index operations
+- Use filters instead of queries where possible
+- Monitor with _stats endpoint
+
+## Vector Search Performance
+For vector search:
+- Use appropriate similarity metric (cosine, dot_product, l2_norm)
+- Tune the num_candidates parameter for accuracy vs performance tradeoff
+- Monitor memory usage as vectors consume significant memory
