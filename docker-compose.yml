@@ -47,6 +47,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        HF_TOKEN: ${HF_TOKEN:-}
     container_name: rag_app
     ports:
       - "8000:8000"
@@ -58,10 +60,11 @@ services:
       - MINIO_SECRET_KEY=minioadmin
       - MINIO_BUCKET=documents
       - OLLAMA_HOST=http://host.docker.internal:11434
-      - OLLAMA_MODEL=gemma:4b
+      - OLLAMA_MODEL=tinyllama:latest
       - EMBEDDING_MODEL=BAAI/bge-m3
       - API_HOST=0.0.0.0
       - API_PORT=8000
+      - HF_TOKEN=${HF_TOKEN:-}
     depends_on:
       elasticsearch:
         condition: service_healthy
@@ -70,9 +73,37 @@ services:
     networks:
       - rag_network
     volumes:
-      - ./app:/app/app
       - ./sample_docs:/app/sample_docs
-    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+      - hf_cache:/root/.cache/huggingface
+
+  # Streamlit Frontend
+  streamlit:
+    build:
+      context: .
+      dockerfile: Dockerfile.streamlit
+    container_name: streamlit_rag
+    ports:
+      - "8501:8501"
+    environment:
+      - API_BASE_URL=http://rag_app:8000/api/v1
+    depends_on:
+      - rag_app
+    networks:
+      - rag_network
+
+  # Kibana for Elasticsearch visualization
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.10.4
+    container_name: kibana_rag
+    ports:
+      - "5601:5601"
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    networks:
+      - rag_network
 
 networks:
   rag_network:
@@ -81,3 +112,4 @@ networks:
 volumes:
   elasticsearch_data:
   minio_data:
+  hf_cache:

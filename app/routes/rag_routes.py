@@ -1,4 +1,5 @@
 from fastapi import APIRouter, File, UploadFile, HTTPException
+from fastapi.responses import StreamingResponse
 from app.services.rag_pipeline import rag_pipeline
 from app.services.ollama_service import ollama_service
 from pydantic import BaseModel
@@ -30,11 +31,12 @@ async def health_check():
 async def ingest_document(file: UploadFile = File(...)):
     """Upload and ingest a PDF document"""
     try:
-        if file.content_type not in ["application/pdf", "text/plain"]:
+        filename = file.filename or ""
+        if not (filename.endswith(".pdf") or filename.endswith(".txt")):
             raise HTTPException(status_code=400, detail="Only PDF and text files are supported")
         
         file_bytes = await file.read()
-        file_type = "pdf" if file.filename.endswith(".pdf") else "text"
+        file_type = "pdf" if filename.endswith(".pdf") else "text"
         
         result = rag_pipeline.ingest_document(file_bytes, file.filename, document_type=file_type)
         
@@ -70,6 +72,22 @@ async def ask_question(request: QuestionRequest):
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error processing question: {str(e)}")
+
+@router.post("/ask/stream")
+async def ask_question_stream(request: QuestionRequest):
+    """Stream answer tokens as NDJSON"""
+    if not request.question.strip():
+        raise HTTPException(status_code=400, detail="Question cannot be empty")
+
+    def stream_generator():
+        yield from rag_pipeline.answer_question_stream(
+            request.question,
+            k=request.k,
+            temperature=request.temperature
+        )
+
+    return StreamingResponse(stream_generator(), media_type="application/x-ndjson")
+
 
 @router.delete("/documents/{document_id}")
 async def delete_document(document_id: str):

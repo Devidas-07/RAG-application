@@ -141,6 +141,34 @@ ANSWER:"""
                 "error": str(e)
             }
     
+    def answer_question_stream(self, question: str, k: int = 5, temperature: float = 0.7):
+        """
+        RAG pipeline with streaming: retrieve context then stream tokens.
+        First yields a JSON metadata line with context, then streams answer tokens.
+        """
+        import json
+        context_chunks = self.retrieve_context(question, k=k)
+
+        if not context_chunks:
+            yield json.dumps({"type": "context", "context_used": []}) + "\n"
+            yield json.dumps({"type": "token", "token": "I couldn't find relevant information in the documents to answer your question."}) + "\n"
+            return
+
+        yield json.dumps({"type": "context", "context_used": context_chunks}) + "\n"
+
+        context_text = "\n\n".join([f"[{i+1}] {chunk['text']}" for i, chunk in enumerate(context_chunks)])
+        prompt = f"""Based on the following context, please answer the question accurately and concisely.
+
+CONTEXT:
+{context_text}
+
+QUESTION: {question}
+
+ANSWER:"""
+
+        for token in ollama_service.generate_stream(prompt, temperature=temperature):
+            yield json.dumps({"type": "token", "token": token}) + "\n"
+
     def delete_document(self, document_id: str) -> dict:
         """Delete a document and its chunks"""
         try:

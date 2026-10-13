@@ -17,8 +17,8 @@ class Config:
     MINIO_BUCKET = os.getenv("MINIO_BUCKET", "documents")
     
     # Ollama
-    OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://localhost:11434")
-    OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "gemma:4b")
+    OLLAMA_HOST = os.getenv("OLLAMA_HOST", "localhost:11434")
+    OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "tinyllama:latest")
     
     # Embedding Model
     EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "BAAI/bge-m3")
